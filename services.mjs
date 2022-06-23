@@ -1,5 +1,5 @@
 import Role from "../../models/role.mjs"
-import { startPeriodicBackupService } from "./services/checker.mjs"
+import { startPeriodicBackupService } from "./services/backup.mjs"
 
 export default async () => {
   // init

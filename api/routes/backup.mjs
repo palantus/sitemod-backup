@@ -7,7 +7,7 @@ export default (app) => {
 
   app.use("/backup", route)
 
-  route.get('/backup', noGuestm, (req, res) => {
+  route.get('/backup', noGuest, (req, res) => {
     if(!validateAccess(req, res, {permission: "admin"})) return;
     res.json({error: "Not implemented"})
   })
