@@ -65,7 +65,9 @@ template.innerHTML = `
       <field-component label="Encrypt"><input type="checkbox" id="src-db-encrypt"></input></field-component>
     </div>
     <div id="src-remote-setup">
-      
+      <field-component label="Remote">
+        <field-edit type="select" lookup="federation-remote"></field-edit>
+      </field-component>
     </div>
     <br>
 
