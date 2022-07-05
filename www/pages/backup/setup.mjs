@@ -28,63 +28,21 @@ template.innerHTML = `
 
   <div id="container">
 
-    <h1>Backup setup</h1>
+    <h1>Backup</h1>
     <field-list labels-pct="30">
     </field-list>
     <br>
 
-    <button class="styled" id="new-btn">New backup</button>
+    <h2>Backups jobs</h2>
+    <table>
+      <tbody id="jobs"></tbody>
+    </table>
+    <br>
+    <button class="styled" id="new-btn">Add new</button>
   </div>
   
-  <dialog-component title="New backup" id="new-dialog">
+  <dialog-component title="New job" id="new-dialog">
     <field-component label="Title"><input id="new-title"></input></field-component>
-    <field-component label="Run every ">
-      <input type="number" id="new-interval"></input>
-      <select id="src-interval-unit">
-        <option value="hour">Hour</option>
-        <option value="day">Day</option>
-        <option value="month">Month</option>
-      </select>
-    </field-component>
-    <br>
-    <h2>Source:</h2>
-    <field-component label="Type">
-      <select id="src-type">
-        <option value="fs">Local file system</option>
-        <option value="db">Database</option>
-        <option value="remote-db">Remote database</option>
-      </select>
-    </field-component>
-    <div id="src-fs-setup">
-      <field-component label="Path"><input id="src-fs-path"></input></field-component>
-      <field-component label="Relative path"><input type="checkbox" id="src-fs-isRelative"></input></field-component>
-      <field-component label="Encrypt"><input type="checkbox" id="src-fs-encrypt"></input></field-component>
-    </div>
-    <div id="src-db-setup">
-      <field-component label="Full backup" title="Including blobs"><input type="checkbox" id="src-db-full"></input></field-component>
-      <field-component label="Encrypt"><input type="checkbox" id="src-db-encrypt"></input></field-component>
-    </div>
-    <div id="src-remote-setup">
-      <field-component label="Remote">
-        <field-edit type="select" lookup="federation-remote"></field-edit>
-      </field-component>
-    </div>
-    <br>
-
-    <h2>Destination;</h2>
-    <field-component label="Type">
-      <select id="dest-type">
-        <option value="fs">Local file system</option>
-        <option value="db">Database blob</option>
-        <option value="remote">Remote server</option>
-      </select>
-    </field-component>
-    <div id="dest-fs-setup">
-      <field-component label="Path"><input id="dest-fs-path"></input></field-component>
-    </div>
-    <br>
-    
-    
   </dialog-component>
 `;
 
@@ -105,8 +63,13 @@ class Element extends HTMLElement {
 
   async refreshData(){
 
-    let setup = await api.get("backup/setup")
+    let jobs = await api.get("backup/job")
 
+    this.shadowRoot.getElementById("jobs").innerHTML = jobs.sort((a, b) => a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 1).map(j => `
+        <tr>
+          <td><field-ref ref="/backup/job/${j.id}">${j.title}</field-ref></td>
+        </tr>
+      `).join("")
 
     this.shadowRoot.querySelectorAll("field-edit:not([disabled])").forEach(e => e.setAttribute("patch", `backup/setup`));
   }
@@ -117,7 +80,8 @@ class Element extends HTMLElement {
     showDialog(dialog, {
       show: () => this.shadowRoot.querySelector("#new-title").focus(),
       ok: async (val) => {
-        
+        await api.post("backup/job", val)
+        this.refreshData()
       },
       validate: (val) => 
         !val.title ? "Please fill out title"
