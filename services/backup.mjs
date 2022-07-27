@@ -29,8 +29,7 @@ async function periodicBackup(){
 async function periodicCleanup(){
   for(let backup of Backup.all()){
     let job = Job.from(backup.related.job);
-    if(!job) log(`Backup ${backup._id} is from a deleted job. Retention is defaulting to 8 days.`);
-    let retentionDays = job?.retentionDays || 8;
+    let retentionDays = job?.retentionDays || 8; // Default to 8 days, in case a backup is from a deleted job
     let obsDate = new Date()
     obsDate.setDate(obsDate.getDate() - retentionDays)
     if(new Date(backup.timestamp).getTime() >= obsDate.getTime())
