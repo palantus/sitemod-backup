@@ -8,6 +8,7 @@ export default class Job extends Entity {
   initNew({title, apiKey, url} = {}) {
     this.id = nextNum("backupjob")
     this.title = title || "New job"
+    this.retentionDays = 7;
     this.tag("backupjob")
   }
 
@@ -81,6 +82,7 @@ export default class Job extends Entity {
       interval: this.interval||0,
       intervalUnit: this.intervalUnit||null,
       nextRun: this.nextRun || null,
+      retentionDays: this.retentionDays||null,
       src: {
         type: this.srcType||"db",
         remote: this.srcRemote || null,

@@ -42,7 +42,7 @@ template.innerHTML = `
   <div id="container">
     <h1>Backup job</h1>
 
-    <field-list labels-pct="20">
+    <field-list labels-pct="30">
       <field-edit type="text" label="Title" id="title"></field-edit>
       <field-edit label="Enabled" type="checkbox" id="enabled"></field-edit>
 
@@ -52,13 +52,14 @@ template.innerHTML = `
         <option value="day">Day</option>
         <option value="month">Month</option>
       </field-edit>
+      <field-edit type="number" id="retentionDays" label="Retension (days)" title="Number of days to keep the backup before deleting it. Note that eg. file drop might delete the file fore that."></field-edit>
       <field-edit type="text" label="Next run" id="nextRun" disabled></field-edit>
     </field-list>
 
     <br>
     <h2>Source</h2>
 
-    <field-list labels-pct="20">
+    <field-list labels-pct="30">
       <field-edit type="select" label="Type" id="srcType">
         <option value="fs">Local file system</option>
         <option value="db">Database</option>
@@ -77,7 +78,7 @@ template.innerHTML = `
 
     <br>
     <h2>Destination</h2>
-    <field-list labels-pct="20">
+    <field-list labels-pct="30">
       <field-edit type="select" id="destType" label="Type">
         <option value="db-local">Database (local)</option>
         <option value="db-remote">Database (remote)</option>
@@ -132,6 +133,7 @@ class Element extends HTMLElement {
     this.shadowRoot.getElementById("enabled").setAttribute("value", !!job.enabled);
     this.shadowRoot.getElementById("interval").setAttribute("value", job.interval||0);
     this.shadowRoot.getElementById("intervalUnit").setAttribute("value", job.intervalUnit||"");
+    this.shadowRoot.getElementById("retentionDays").setAttribute("value", job.retentionDays||0);
     this.shadowRoot.getElementById("nextRun").setAttribute("value", job.nextRun||"");
 
     this.shadowRoot.getElementById("srcType").setAttribute("value", job.src.type||"");

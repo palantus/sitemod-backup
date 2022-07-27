@@ -81,6 +81,7 @@ export default (app) => {
     if(typeof req.body.enabled === "boolean") job.enabled = req.body.enabled;
     if(typeof req.body.interval === "number") job.interval = req.body.interval;
     if(typeof req.body.intervalUnit === "string" && req.body.intervalUnit) job.intervalUnit = req.body.intervalUnit;
+    if(typeof req.body.retentionDays === "number" && req.body.retentionDays) job.retentionDays = req.body.retentionDays;
 
     if(typeof req.body.srcType === "string") job.srcType = req.body.srcType || null;
 

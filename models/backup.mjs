@@ -4,6 +4,7 @@ import { getTimestamp } from "../../../tools/date.mjs"
 import Job from "./job.mjs";
 import LogEntry from "../../../models/logentry.mjs"
 import {createWriteStream} from 'node:fs';
+import {unlink} from 'fs';
 import {pipeline} from 'node:stream/promises';
 import {join} from "path"
 
@@ -100,12 +101,28 @@ export default class Backup extends Entity {
     }
   }
 
+  delete(){
+    if(this.isRemote()){
+
+    } else {
+      if(this.filePath){
+        unlink(this.filePath, () => null)
+      }
+    }
+
+    super.delete()
+  }
+
+  isRemote(){
+    return this.related.job?.destType?.includes("remote")
+  }
+
   toObj(){
     return {
       id: this._id,
       timestamp: this.timestamp,
       done: this.tags.includes("done"),
-      remote: this.related.job?.destType?.includes("remote") ? Remote.from(this.related.remote)?.toObj()||null : null,
+      remote: this.isRemote() ? Remote.from(this.related.remote)?.toObj()||null : null,
       job: Job.from(this.related.job)?.toObj()||null,
       filePath: this.filePath||null,
       remotePath: this.remotePath||null
