@@ -11,7 +11,7 @@ export default class Job extends Entity {
     this.title = title || "New job"
     this.intervalUnit = "day"
     this.interval = 7
-    this.retentionDays = 7;
+    this.retentionDays = 8;
     this.srcType = "db"
     this.destType = "db-remote",
     this.tag("backupjob")

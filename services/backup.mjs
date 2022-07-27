@@ -29,17 +29,14 @@ async function periodicBackup(){
 async function periodicCleanup(){
   for(let backup of Backup.all()){
     let job = Job.from(backup.related.job);
-    if(!job){
-      log(`Backup ${backup._id} is missing a job. Skipping cleanup.`)
-      continue;
-    }
-    let retentionDays = job.retentionDays || 7;
+    if(!job) log(`Backup ${backup._id} is from a deleted job. Retention is defaulting to 8 days.`);
+    let retentionDays = job?.retentionDays || 8;
     let obsDate = new Date()
     obsDate.setDate(obsDate.getDate() - retentionDays)
     if(new Date(backup.timestamp).getTime() >= obsDate.getTime())
       continue;
 
-    log(`Deleting backup from ${backup.timestamp} (${job.title}) due to retension setup`)
+    log(`Deleting backup from ${backup.timestamp} (${job?.title||"UNKNOWN_JOB"}) due to retension setup`)
     backup.delete()
   }
 }
