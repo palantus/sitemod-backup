@@ -1,11 +1,8 @@
 import Entity, {query, nextNum} from "entitystorage"
-import LogEntry from "../../../models/logentry.mjs"
 import Remote from "../../../models/remote.mjs"
 import {join} from "path"
 import {access} from "node:fs/promises"
-import {createWriteStream} from 'node:fs';
-import {pipeline} from 'node:stream/promises';
-import { getTimestamp } from "../../../tools/date.mjs"
+import Backup from "./backup.mjs"
 
 export default class Job extends Entity {
   initNew({title, apiKey, url} = {}) {
@@ -21,11 +18,6 @@ export default class Job extends Entity {
 
   static all(){
     return query.type(Job).tag("backupjob").all
-  }
-
-  log(text, isError){
-    this.rel(new LogEntry(isError ? `Error: ${text}` : text, "backup"), "log")
-    if(isError) throw text
   }
 
   async validate(){
@@ -76,61 +68,9 @@ export default class Job extends Entity {
     }
   }
 
-  async execute(){
-    this.log(`Running backup ${this.id}: ${this.title}`)
-
-    let validateRes = await this.validate()
-    if(validateRes) throw validateRes
-
-    let src = null;
-    try{
-      switch(this.srcType){
-        case "fs": 
-          src = await this.getSourceFS()
-          break;
-        case "db": 
-          src = await this.getSourceDB()
-          break;
-        case "remote-db": 
-          src = await this.getSourceDBRemote()
-          break;
-        default:
-          this.log(`Unknown source type: ${this.srcType}`)
-          return null;
-      }
-    } catch(err){
-      this.log(`Got error requesting source: ${err}`)
-      return null;
-    }
-
-    if(!src) this.log("Invalid source data", true)
-
-    if(this.destType == "fs-local"){
-      let path = this.buildPath(this.destFSPath, !!this.destFSIsRelative)
-
-      if(src.type == "fetch-response"){
-        await pipeline(src.res.body, createWriteStream(join(path, `backup_${getTimestamp()}.zip`)));
-      } else {
-        this.log("Unknown source data type", true)
-      }
-    } else {
-      this.log("Unknown dest type", true)
-    }
-
-    this.log("Finished")
-  }
-
-  async getSourceDBRemote(){
-    if(!this.srcRemote) this.log("No remote provided", true)
-    let remote = Remote.lookup(this.srcRemote);
-    if(!remote) this.log(`Unkown source remote: ${this.srcRemote}`, true)
-    try{
-      let res = await remote.get("system/database/download/data", {returnRaw: true})
-      return {type: "fetch-response", res}
-    } catch(err){
-      this.log(`Got error when requesting source db remote: ${err}`)
-      return null;
-    }
+  execute(){
+    let backup = new Backup(this)
+    return backup.execute()
   }
 
   toObj() {

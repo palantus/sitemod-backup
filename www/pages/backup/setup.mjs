@@ -23,6 +23,9 @@ template.innerHTML = `
     field-list{
       width: 600px;
     }
+    #backups-container{
+      margin-top: 20px;
+    }
     .hidden{display: none;}
   </style>  
 
@@ -33,12 +36,29 @@ template.innerHTML = `
     </field-list>
     <br>
 
-    <h2>Backups jobs</h2>
+    <h2>Jobs</h2>
     <table>
       <tbody id="jobs"></tbody>
     </table>
     <br>
-    <button class="styled" id="new-btn">Add new</button>
+    <button class="styled" id="new-btn">Add new job</button>
+
+    <div id="backups-container">
+      <h2>History</h2>
+      <table class="datalist">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Job</th>
+            <th>Status</th>
+            <th>Location</th>
+            <th>Path</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="backups"></tbody>
+      </table>
+    </div>
   </div>
   
   <dialog-component title="New job" id="new-dialog">
@@ -63,11 +83,22 @@ class Element extends HTMLElement {
 
   async refreshData(){
 
-    let jobs = await api.get("backup/job")
+    let [jobs, backups] = await Promise.all([api.get("backup/job"), api.get("backup/backups")])
 
     this.shadowRoot.getElementById("jobs").innerHTML = jobs.sort((a, b) => a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 1).map(j => `
         <tr>
           <td><field-ref ref="/backup/job/${j.id}">${j.title}</field-ref></td>
+        </tr>
+      `).join("")
+
+    this.shadowRoot.getElementById("backups").innerHTML = backups.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1).map(b => `
+        <tr>
+          <td>${b.timestamp.replace("T", ' ').substring(0, 19)}</td>
+          <td><field-ref ref="/backup/job/${b.job?.id}">${b.job?.title}</field-ref></td>
+          <td>${b.done ? "Finished" : "Unfinished"}</td>
+          <td>${b.remote ? `<field-ref ref="/federation/remote/${b.remote?.id}">${b.remote?.title}</field-ref>` : "Local"}</td>
+          <td>${b.filePath||b.remotePath}</td>
+          <td><field-ref ref="/backup/backup/${b.id}/log">Log</field-ref></td>
         </tr>
       `).join("")
 

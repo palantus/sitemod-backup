@@ -2,6 +2,7 @@ import express from "express"
 const { Router, Request, Response } = express;
 const route = Router();
 import { noGuest, validateAccess } from "../../../../services/auth.mjs"
+import Backup from "../../models/backup.mjs";
 import Job from "../../models/job.mjs"
 
 export default (app) => {
@@ -38,6 +39,13 @@ export default (app) => {
     let job = Job.lookup(req.params.id)
     if (!job) throw "Unknown job"
     res.json(job.toObj());
+  });
+
+  route.get('/job/:id/log', function (req, res, next) {
+    if(!validateAccess(req, res, {permission: "admin"})) return;
+    let job = Job.lookup(req.params.id)
+    if (!job) throw "Unknown job"
+    res.json(job.rels.log?.map(l => ({timestamp: l.timestamp, text: l.text}))||[]);
   });
 
   route.post('/job/:id/exec', function (req, res, next) {
@@ -89,5 +97,17 @@ export default (app) => {
     if(typeof req.body.destRemote === "string") job.destRemote = req.body.destRemote || null;
 
     res.json(true);
+  });
+
+  route.get('/backups', function (req, res, next) {
+    if(!validateAccess(req, res, {permission: "admin"})) return;
+    res.json(Backup.all().map(f => f.toObj()));
+  });
+
+  route.get('/backup/:id/log', function (req, res, next) {
+    if(!validateAccess(req, res, {permission: "admin"})) return;
+    let backup = Backup.lookup(req.params.id)
+    if (!backup) throw "Unknown backup"
+    res.json(backup.rels.log?.map(l => ({timestamp: l.timestamp, text: l.text}))||[]);
   });
 };

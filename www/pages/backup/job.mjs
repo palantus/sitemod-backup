@@ -6,7 +6,7 @@ import "/components/action-bar-item.mjs"
 import "/components/field-edit.mjs"
 import "/components/field-list.mjs"
 import {on, off} from "/system/events.mjs"
-import {state} from "/system/core.mjs"
+import {state, goto} from "/system/core.mjs"
 import { confirmDialog, alertDialog } from "../../components/dialog.mjs"
 
 
@@ -36,6 +36,7 @@ template.innerHTML = `
     <action-bar-item id="exec-btn">Run now</action-bar-item>
     <action-bar-item id="validate-btn">Validate</action-bar-item>
     <action-bar-item id="delete-btn">Delete</action-bar-item>
+    <action-bar-item id="log-btn">Log</action-bar-item>
   </action-bar>
 
   <div id="container">
@@ -109,6 +110,7 @@ class Element extends HTMLElement {
 
     this.shadowRoot.getElementById("exec-btn").addEventListener("click", this.execNow)
     this.shadowRoot.getElementById("validate-btn").addEventListener("click", () => api.get(`backup/job/${this.jobId}/validate`).then(res => alertDialog(res.error ? `Validation failed with error: ${res.error}` : "Validation successful!")))
+    this.shadowRoot.getElementById("log-btn").addEventListener("click", () => goto(`/backup/job/${this.jobId}/log`))
 
     this.shadowRoot.getElementById("delete-btn").addEventListener("click", 
           () => confirmDialog(`Are you sure that you want to delete this backup?`)
