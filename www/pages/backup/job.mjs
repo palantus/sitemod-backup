@@ -52,8 +52,8 @@ template.innerHTML = `
         <option value="day">Day</option>
         <option value="month">Month</option>
       </field-edit>
-      <field-edit type="number" id="retentionDays" label="Retension (days)" title="Number of days to keep the backup before deleting it. Note that eg. file drop might delete the file fore that."></field-edit>
       <field-edit type="text" label="Next run" id="nextRun" disabled></field-edit>
+      <field-edit type="number" id="retentionDays" label="Retension (days)" title="Number of days to keep the backup before deleting it. Note that eg. file drop might delete the file fore that."></field-edit>
     </field-list>
 
     <br>
@@ -112,6 +112,9 @@ class Element extends HTMLElement {
     this.shadowRoot.getElementById("exec-btn").addEventListener("click", this.execNow)
     this.shadowRoot.getElementById("validate-btn").addEventListener("click", () => api.get(`backup/job/${this.jobId}/validate`).then(res => alertDialog(res.error ? `Validation failed with error: ${res.error}` : "Validation successful!")))
     this.shadowRoot.getElementById("log-btn").addEventListener("click", () => goto(`/backup/job/${this.jobId}/log`))
+
+    this.shadowRoot.getElementById("interval").addEventListener("value-changed", this.refreshData)
+    this.shadowRoot.getElementById("intervalUnit").addEventListener("value-changed", this.refreshData)
 
     this.shadowRoot.getElementById("delete-btn").addEventListener("click", 
           () => confirmDialog(`Are you sure that you want to delete this backup?`)

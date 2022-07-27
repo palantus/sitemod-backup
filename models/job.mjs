@@ -3,12 +3,17 @@ import Remote from "../../../models/remote.mjs"
 import {join} from "path"
 import {access} from "node:fs/promises"
 import Backup from "./backup.mjs"
+import { getTimestamp } from "../../../tools/date.mjs"
 
 export default class Job extends Entity {
   initNew({title, apiKey, url} = {}) {
     this.id = nextNum("backupjob")
     this.title = title || "New job"
+    this.intervalUnit = "day"
+    this.interval = 7
     this.retentionDays = 7;
+    this.srcType = "db"
+    this.destType = "db-remote",
     this.tag("backupjob")
   }
 
@@ -72,6 +77,31 @@ export default class Job extends Entity {
   execute(){
     let backup = new Backup(this)
     return backup.execute()
+  }
+
+  calcNextRun(){
+    let unit = this.intervalUnit
+    let interval = this.interval || 7
+    let lastRun = this.lastRun
+
+    if(!lastRun){
+      this.nextRun = getTimestamp()
+      return;
+    }
+    
+    let runDate = new Date()
+    if(unit == "hour"){
+      runDate.setHours(runDate.getHours() + interval)
+    } else if(unit == "day"){
+      runDate.setDate(runDate.getDate() + interval)
+    } else if(unit == "month"){
+      runDate.setMonth(runDate.getMonth() + interval)
+    } else {
+      this.nextRun = null;
+      return;
+    }
+
+    this.nextRun = getTimestamp(runDate.getTime() - new Date().getTime())
   }
 
   toObj() {

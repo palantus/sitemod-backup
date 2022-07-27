@@ -79,8 +79,14 @@ export default (app) => {
     if (!job) throw "Unknown job"
     if(typeof req.body.title === "string" && req.body.title) job.title = req.body.title;
     if(typeof req.body.enabled === "boolean") job.enabled = req.body.enabled;
-    if(typeof req.body.interval === "number") job.interval = req.body.interval;
-    if(typeof req.body.intervalUnit === "string" && req.body.intervalUnit) job.intervalUnit = req.body.intervalUnit;
+    if(typeof req.body.interval === "number") {
+      job.interval = req.body.interval;
+      job.calcNextRun()
+    }
+    if(typeof req.body.intervalUnit === "string" && req.body.intervalUnit) {
+      job.intervalUnit = req.body.intervalUnit;
+      job.calcNextRun()
+    }
     if(typeof req.body.retentionDays === "number" && req.body.retentionDays) job.retentionDays = req.body.retentionDays;
 
     if(typeof req.body.srcType === "string") job.srcType = req.body.srcType || null;

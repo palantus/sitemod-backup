@@ -7,6 +7,9 @@ import {createWriteStream} from 'node:fs';
 import {unlink} from 'fs';
 import {pipeline} from 'node:stream/promises';
 import {join} from "path"
+import fetch from "node-fetch"
+import User from "../../../models/user.mjs";
+import {service as userService} from "../../../services/user.mjs"
 
 export default class Backup extends Entity {
   initNew(job) {
@@ -35,6 +38,11 @@ export default class Backup extends Entity {
   }
 
   done(){
+    let job = Job.from(this.related.job)
+    if(job){
+      job.lastRun = getTimestamp()
+      job.calcNextRun()
+    }
     this.tag("done")
   }
 
@@ -50,7 +58,8 @@ export default class Backup extends Entity {
     try{
       switch(job.srcType){
         case "fs": 
-          src = await this.getSourceFS(job)
+          //src = await this.getSourceFS(job)
+          this.log("fs source not implemented", true)
           break;
         case "db": 
           src = await this.getSourceDB(job)
@@ -59,7 +68,7 @@ export default class Backup extends Entity {
           src = await this.getSourceDBRemote(job)
           break;
         default:
-          this.log(`Unknown source type: ${job.srcType}`)
+          this.log(`Unknown source type: ${job.srcType}`, true)
           return null;
       }
     } catch(err){
@@ -80,11 +89,27 @@ export default class Backup extends Entity {
         this.log("Unknown source data type", true)
       }
     } else {
-      this.log("Unknown dest type", true)
+      this.log("Unknown dest type: " + job.destType, true)
     }
 
     this.log("Finished")
     this.done()
+  }
+
+  async getSourceDB(job){
+    let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}?encrypt=${job.srcEncrypt ? "true" : "false"}`
+    try{
+      let authToken = userService.getTempAuthToken(User.lookupAdmin())
+      let res = await fetch(`${global.sitecore.apiURL}/${path}`, {
+        headers: {
+          'Authorization': 'Basic ' + Buffer.from(`${''}:${authToken}`, 'binary').toString('base64')
+        }
+      })
+      return {type: "fetch-response", res}
+    } catch(err){
+      this.log(`Got error when requesting source db from local: ${err}`)
+      return null;
+    }
   }
 
   async getSourceDBRemote(job){

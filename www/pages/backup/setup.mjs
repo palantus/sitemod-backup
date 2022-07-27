@@ -3,8 +3,11 @@ const elementName = 'backup-setup-page'
 import api from "/system/api.mjs"
 import "/components/field-edit.mjs"
 import "/components/field-list.mjs"
+import "/components/action-bar.mjs"
+import "/components/action-bar-item.mjs"
 import {on, off} from "/system/events.mjs"
 import { promptDialog, confirmDialog, showDialog } from "/components/dialog.mjs"
+import {goto} from "/system/core.mjs"
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -28,6 +31,10 @@ template.innerHTML = `
     }
     .hidden{display: none;}
   </style>  
+
+  <action-bar>
+    <action-bar-item id="log-btn">Log</action-bar-item>
+  </action-bar>
 
   <div id="container">
 
@@ -77,6 +84,7 @@ class Element extends HTMLElement {
     this.newBackup = this.newBackup.bind(this)
     
     this.shadowRoot.getElementById("new-btn").addEventListener("click", this.newBackup)
+    this.shadowRoot.getElementById("log-btn").addEventListener("click", () => goto(`/logs?area=backup`))
 
     this.refreshData();
   }
