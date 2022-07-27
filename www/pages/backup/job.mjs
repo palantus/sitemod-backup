@@ -69,11 +69,13 @@ template.innerHTML = `
       <field-edit class="src fs" label="Path" type="text" id="srcFSPath"></field-edit>
       <field-edit class="src fs" label="Relative path" type="checkbox" id="srcFSIsRelative"></field-edit>
       <field-edit class="src fs" label="Encrypt" type="checkbox" id="srcEncrypt"></field-edit>
+      <field-edit class="src fs" label="Password" type="text" id="srcEncryptPassword"></field-edit>
 
       <field-edit class="src remote" type="select" label="Remote" lookup="federation-remote" id="srcRemote"></field-edit>
 
       <field-edit class="src db" label="Full backup" title="Including blobs" type="checkbox" id="srcDatabaseFull"></field-edit>
       <field-edit class="src db" label="Encrypt" type="checkbox" id="srcDBEncrypt" field="srcEncrypt"></field-edit>
+      <field-edit class="src db" label="Password" type="text" id="srcDBEncryptPassword" field="srcEncryptPassword"></field-edit>
     </field-list>
 
     <br>
@@ -144,9 +146,11 @@ class Element extends HTMLElement {
     this.shadowRoot.getElementById("srcFSPath").setAttribute("value", job.src.fs.path||"");
     this.shadowRoot.getElementById("srcFSIsRelative").setAttribute("value", job.src.fs.isRelative);
     this.shadowRoot.getElementById("srcEncrypt").setAttribute("value", job.src.fs.encrypt);
+    this.shadowRoot.getElementById("srcEncryptPassword").setAttribute("value", job.src.fs.encryptPasswordSet ? "*******" : "");
     this.shadowRoot.getElementById("srcRemote").setAttribute("value", job.src.remote);
     this.shadowRoot.getElementById("srcDatabaseFull").setAttribute("value", job.src.db.isFull);
     this.shadowRoot.getElementById("srcDBEncrypt").setAttribute("value", job.src.db.encrypt);
+    this.shadowRoot.getElementById("srcDBEncryptPassword").setAttribute("value", job.src.fs.encryptPasswordSet ? "*******" : "");
 
     this.shadowRoot.getElementById("destType").setAttribute("value", job.dest.type||"");
 

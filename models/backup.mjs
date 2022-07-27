@@ -101,9 +101,12 @@ export default class Backup extends Entity {
     try{
       let authToken = userService.getTempAuthToken(User.lookupAdmin())
       let res = await fetch(`${global.sitecore.apiURL}/${path}`, {
+        method: "POST",
         headers: {
-          'Authorization': 'Basic ' + Buffer.from(`${''}:${authToken}`, 'binary').toString('base64')
-        }
+          'Authorization': 'Basic ' + Buffer.from(`${''}:${authToken}`, 'binary').toString('base64'),
+          'Content-Type' : "application/json"
+        },
+        body: JSON.stringify({encrypt: !!job.srcEncrypt, password: job.srcEncryptPassword})
       })
       return {type: "fetch-response", res}
     } catch(err){
@@ -116,9 +119,9 @@ export default class Backup extends Entity {
     if(!job.srcRemote) this.log("No remote provided", true)
     let remote = Remote.lookup(job.srcRemote);
     if(!remote) this.log(`Unkown source remote: ${job.srcRemote}`, true)
-    let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}?encrypt=${job.srcEncrypt ? "true" : "false"}`
+    let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}`
     try{
-      let res = await remote.get(path, {returnRaw: true})
+      let res = await remote.post(path, {encrypt: !!job.srcEncrypt, password: job.srcEncryptPassword}, {returnRaw: true})
       return {type: "fetch-response", res}
     } catch(err){
       this.log(`Got error when requesting source db remote: ${err}`)

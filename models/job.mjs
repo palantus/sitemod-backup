@@ -120,11 +120,13 @@ export default class Job extends Entity {
         fs: {
           path: this.srcFSPath || null,
           isRelative: !!this.srcFSIsRelative,
-          encrypt: !!this.srcEncrypt
+          encrypt: !!this.srcEncrypt,
+          encryptPasswordSet: !!this.srcEncryptPassword
         },
         db: {
           isFull: !!this.srcDatabaseFull,
-          encrypt: !!this.srcEncrypt
+          encrypt: !!this.srcEncrypt,
+          encryptPasswordSet: !!this.srcEncryptPassword
         }
       },
       dest: {

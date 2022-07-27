@@ -94,6 +94,7 @@ export default (app) => {
     if(typeof req.body.srcFSPath === "string") job.srcFSPath = req.body.srcFSPath || null;
     if(typeof req.body.srcFSIsRelative === "boolean") job.srcFSIsRelative = req.body.srcFSIsRelative;
     if(typeof req.body.srcEncrypt === "boolean") job.srcEncrypt = req.body.srcEncrypt;
+    if(typeof req.body.srcEncryptPassword === "string") job.srcEncryptPassword = req.body.srcEncryptPassword;
     if(typeof req.body.srcRemote === "string") job.srcRemote = req.body.srcRemote || null;
     if(typeof req.body.srcDatabaseFull === "boolean") job.srcDatabaseFull = req.body.srcDatabaseFull;
 
