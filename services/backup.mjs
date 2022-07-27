@@ -11,7 +11,7 @@ function log(text){
 export function startPeriodicBackupService(){
   periodicBackup()
   periodicCleanup()
-  return setInterval(periodicBackup, 10_000_000) // Run every few hours
+  return setInterval(periodicBackup, 2_000_000) // Run 1-2 times per hour
 }
 
 async function periodicBackup(){

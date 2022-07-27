@@ -111,6 +111,7 @@ export default class Job extends Entity {
       enabled: !!this.enabled,
       interval: this.interval||0,
       intervalUnit: this.intervalUnit||null,
+      lastRun: this.lastRun || null,
       nextRun: this.nextRun || null,
       retentionDays: this.retentionDays||null,
       src: {

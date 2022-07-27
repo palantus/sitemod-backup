@@ -33,6 +33,7 @@ template.innerHTML = `
   </style>  
 
   <action-bar>
+    <action-bar-item id="refresh-btn">Refresh</action-bar-item>
     <action-bar-item id="log-btn">Log</action-bar-item>
   </action-bar>
 
@@ -44,7 +45,17 @@ template.innerHTML = `
     <br>
 
     <h2>Jobs</h2>
-    <table>
+    <table class="datalist">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Enabled</th>
+          <th>Source</th>
+          <th>Destination</th>
+          <th>Last run</th>
+          <th>Next run</th>
+        </tr>
+      </thead>
       <tbody id="jobs"></tbody>
     </table>
     <br>
@@ -84,6 +95,7 @@ class Element extends HTMLElement {
     this.newBackup = this.newBackup.bind(this)
     
     this.shadowRoot.getElementById("new-btn").addEventListener("click", this.newBackup)
+    this.shadowRoot.getElementById("refresh-btn").addEventListener("click", this.refreshData)
     this.shadowRoot.getElementById("log-btn").addEventListener("click", () => goto(`/logs?area=backup`))
 
     this.refreshData();
@@ -96,6 +108,11 @@ class Element extends HTMLElement {
     this.shadowRoot.getElementById("jobs").innerHTML = jobs.sort((a, b) => a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 1).map(j => `
         <tr>
           <td><field-ref ref="/backup/job/${j.id}">${j.title}</field-ref></td>
+          <td>${j.enabled?"&#10004;":""}</td>
+          <td>${j.src.type||""}</td>
+          <td>${j.dest.type||""}</td>
+          <td>${j.lastRun?.replace("T", ' ').substring(0, 19) || "N/A"}</td>
+          <td>${j.nextRun?.replace("T", ' ').substring(0, 19) || "N/A"}</td>
         </tr>
       `).join("")
 
