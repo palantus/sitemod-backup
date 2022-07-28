@@ -61,10 +61,9 @@ template.innerHTML = `
 
     <field-list labels-pct="30">
       <field-edit type="select" label="Type" id="srcType">
-        <option value="fs">Local file system</option>
+        <option value="fs">Local file system - not implemented yet!</option>
         <option value="db">Database</option>
         <option value="remote-db">Remote database</option>
-        <option value="remote-backup">Remote backup job (last backup)</option>
       </field-edit>
 
       <field-edit class="src fs" label="Path" type="text" id="srcFSPath"></field-edit>

@@ -7,7 +7,7 @@ import "/components/action-bar.mjs"
 import "/components/action-bar-item.mjs"
 import {on, off} from "/system/events.mjs"
 import { promptDialog, confirmDialog, showDialog } from "/components/dialog.mjs"
-import {goto} from "/system/core.mjs"
+import {goto, apiURL} from "/system/core.mjs"
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -93,10 +93,13 @@ class Element extends HTMLElement {
 
     this.refreshData = this.refreshData.bind(this);
     this.newBackup = this.newBackup.bind(this)
+    this.backupsClick = this.backupsClick.bind(this)
     
     this.shadowRoot.getElementById("new-btn").addEventListener("click", this.newBackup)
     this.shadowRoot.getElementById("refresh-btn").addEventListener("click", this.refreshData)
     this.shadowRoot.getElementById("log-btn").addEventListener("click", () => goto(`/logs?area=backup`))
+
+    this.shadowRoot.getElementById("backups").addEventListener("click", this.backupsClick)
 
     this.refreshData();
   }
@@ -117,13 +120,16 @@ class Element extends HTMLElement {
       `).join("")
 
     this.shadowRoot.getElementById("backups").innerHTML = backups.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1).map(b => `
-        <tr>
+        <tr data-id="${b.id}">
           <td>${b.timestamp.replace("T", ' ').substring(0, 19)}</td>
           <td><field-ref ref="/backup/job/${b.job?.id}">${b.job?.title}</field-ref></td>
           <td>${b.done ? "Finished" : "Unfinished"}</td>
           <td>${b.remote ? `<field-ref ref="/federation/remote/${b.remote?.id}">${b.remote?.title}</field-ref>` : "Local"}</td>
-          <td>${b.filePath||b.remotePath}</td>
-          <td><field-ref ref="/backup/backup/${b.id}/log">Log</field-ref></td>
+          <td>${b.filePath||b.remotePath||""}</td>
+          <td>
+            <field-ref ref="/backup/backup/${b.id}/log">Log</field-ref>
+            <button class="download ${b.job?.dest.type != "db-local" ? "hidden" : ""}">Download</button>
+          </td>
         </tr>
       `).join("")
 
@@ -149,6 +155,15 @@ class Element extends HTMLElement {
         this.shadowRoot.querySelectorAll("field-component input").forEach(e => e.value = '')
       }
     })
+  }
+
+  async backupsClick(e){
+    let id = e.target.closest("tr")?.getAttribute("data-id")
+    if(!id) return;
+    if(e.target.tagName == "BUTTON" && e.target.classList.contains("download")){
+      let {token} = await api.get("me/token")
+      window.open(`${apiURL()}/backup/backup/${id}/download?token=${token}`)
+    }
   }
 
   connectedCallback() {

@@ -78,9 +78,11 @@ export default class Backup extends Entity {
 
     if(!src) this.log("Invalid source data", true)
 
+    this.filename = `backup_${getTimestamp()}.zip`;
+
     if(job.destType == "fs-local"){
       let path = job.buildPath(job.destFSPath, !!job.destFSIsRelative)
-      let filePath = join(path, `backup_${getTimestamp()}.zip`)
+      let filePath = join(path, this.filename)
       if(src.type == "fetch-response"){
         await pipeline(src.res.body, createWriteStream(filePath));
         this.filePath = filePath
@@ -88,6 +90,17 @@ export default class Backup extends Entity {
       } else {
         this.log("Unknown source data type", true)
       }
+
+    } else if(job.destType == "db-local"){
+      if(src.type == "fetch-response"){
+        console.log(src.res.headers)
+        console.log(src.res.headers.get("Content-Length"))
+        this.setBlob(src.res.body)
+        this.log(`Storing backup as blob`)
+      } else {
+        this.log("Unknown source data type", true)
+      }
+
     } else {
       this.log("Unknown dest type: " + job.destType, true)
     }

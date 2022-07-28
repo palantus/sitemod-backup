@@ -118,4 +118,18 @@ export default (app) => {
     if (!backup) throw "Unknown backup"
     res.json(backup.rels.log?.map(l => ({timestamp: l.timestamp, text: l.text}))||[]);
   });
+
+  route.get('/backup/:id/download', function (req, res, next) {
+    if(!validateAccess(req, res, {permission: "admin"})) return;
+    let backup = Backup.lookup(req.params.id)
+    if (!backup) throw "Unknown backup"
+    if(backup.related.job.destType == "db-local"){
+      res.setHeader('Content-disposition', `attachment; filename=${backup.filename||"backup.zip"}`);
+      res.setHeader('Content-Type', "application/zip");
+      if(backup.size) res.setHeader('Content-Length', backup.size);
+      backup.blob.pipe(res)
+    } else {
+      res.sendStatus(404);
+    }
+  });
 };

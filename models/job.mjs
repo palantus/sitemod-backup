@@ -79,7 +79,7 @@ export default class Job extends Entity {
     try{
       return await backup.execute()
     } catch(err){
-      backup.log("Failed executing job")
+      backup.log(`Failed executing job: ${err}`)
       return err;
     }
   }
