@@ -44,7 +44,7 @@ template.innerHTML = `
     </field-list>
     <br>
 
-    <h2>Jobs</h2>
+    <h2>Periodic jobs</h2>
     <table class="datalist">
       <thead>
         <tr>
@@ -128,7 +128,7 @@ class Element extends HTMLElement {
           <td>${b.filePath||b.remotePath||""}</td>
           <td>
             <field-ref ref="/backup/backup/${b.id}/log">Log</field-ref>
-            <button class="download ${b.job?.dest.type != "db-local" ? "hidden" : ""}">Download</button>
+            <button class="download ${["db-local", "fs-local"].includes(b.job?.dest.type) ? "" : "hidden"}">Download</button>
           </td>
         </tr>
       `).join("")

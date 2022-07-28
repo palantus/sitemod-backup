@@ -128,6 +128,13 @@ export default (app) => {
       res.setHeader('Content-Type', "application/zip");
       if(backup.size) res.setHeader('Content-Length', backup.size);
       backup.blob.pipe(res)
+    } else if(backup.related.job.destType == "fs-local"){
+      if(backup.filePath){
+        res.setHeader('Content-disposition', `attachment; filename=${backup.filename||"backup.zip"}`);
+        res.setHeader('Content-Type', "application/zip");
+        res.sendFile(backup.filePath)
+      } else
+        res.sendStatus(404);
     } else {
       res.sendStatus(404);
     }
