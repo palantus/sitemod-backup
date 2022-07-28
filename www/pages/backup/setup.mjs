@@ -62,7 +62,7 @@ template.innerHTML = `
     <button class="styled" id="new-btn">Add new job</button>
 
     <div id="backups-container">
-      <h2>History</h2>
+      <h2>Backups</h2>
       <table class="datalist">
         <thead>
           <tr>
