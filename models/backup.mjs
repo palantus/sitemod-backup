@@ -86,17 +86,27 @@ export default class Backup extends Entity {
       if(src.type == "fetch-response"){
         await pipeline(src.res.body, createWriteStream(filePath));
         this.filePath = filePath
-        this.log(`Storing backup as: ${filePath}`)
+        this.log(`Stored backup as: ${filePath}`)
       } else {
         this.log("Unknown source data type", true)
       }
 
     } else if(job.destType == "db-local"){
       if(src.type == "fetch-response"){
-        console.log(src.res.headers)
-        console.log(src.res.headers.get("Content-Length"))
         this.setBlob(src.res.body)
-        this.log(`Storing backup as blob`)
+        this.log(`Stored backup as blob`)
+      } else {
+        this.log("Unknown source data type", true)
+      }
+
+    } else if(job.destType == "drop-remote"){
+      if(src.type == "fetch-response"){
+        let remote = Remote.lookup(job.destRemote)
+        let buffer = await src.res.arrayBuffer()
+        let dropFile = await remote.upload(`file/drop`, buffer, this.filename||"backup.zip")
+        this.url = dropFile[0]?.dropLink||null
+        this.remoteId = dropFile[0]?.id
+        this.log(`Stored backup in file drop on ${remote.title}`)
       } else {
         this.log("Unknown source data type", true)
       }
@@ -144,7 +154,12 @@ export default class Backup extends Entity {
 
   delete(){
     if(this.isRemote()){
-
+      if(this.related.job?.destType === "drop-remote"){
+        if(this.remoteId && this.related.remote){
+          let remote = Remote.from(this.related.remote)
+          remote.del(`file/${this.remoteId}`).catch(() => null).then(() => null)
+        }
+      }
     } else {
       if(this.filePath){
         unlink(this.filePath, () => null)
@@ -166,7 +181,8 @@ export default class Backup extends Entity {
       remote: this.isRemote() ? Remote.from(this.related.remote)?.toObj()||null : null,
       job: Job.from(this.related.job)?.toObj()||null,
       filePath: this.filePath||null,
-      remotePath: this.remotePath||null
+      remotePath: this.remotePath||null,
+      url: this.url||null
     }
   }
 }

@@ -119,6 +119,14 @@ export default (app) => {
     res.json(backup.rels.log?.map(l => ({timestamp: l.timestamp, text: l.text}))||[]);
   });
 
+  route.delete('/backup/:id', function (req, res, next) {
+    if(!validateAccess(req, res, {permission: "admin"})) return;
+    let backup = Backup.lookup(req.params.id)
+    if (!backup) throw "Unknown backup"
+    backup.delete()
+    res.json({success: true});
+  });
+
   route.get('/backup/:id/download', function (req, res, next) {
     if(!validateAccess(req, res, {permission: "admin"})) return;
     let backup = Backup.lookup(req.params.id)

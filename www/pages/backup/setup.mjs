@@ -6,7 +6,7 @@ import "/components/field-list.mjs"
 import "/components/action-bar.mjs"
 import "/components/action-bar-item.mjs"
 import {on, off} from "/system/events.mjs"
-import { promptDialog, confirmDialog, showDialog } from "/components/dialog.mjs"
+import { alertDialog, showDialog, confirmDialog } from "/components/dialog.mjs"
 import {goto, apiURL} from "/system/core.mjs"
 
 const template = document.createElement('template');
@@ -120,7 +120,7 @@ class Element extends HTMLElement {
       `).join("")
 
     this.shadowRoot.getElementById("backups").innerHTML = backups.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1).map(b => `
-        <tr data-id="${b.id}">
+        <tr data-id="${b.id}" data-url="${b.url||""}" data-type="${b.job?.dest.type||""}">
           <td>${b.timestamp.replace("T", ' ').substring(0, 19)}</td>
           <td><field-ref ref="/backup/job/${b.job?.id}">${b.job?.title}</field-ref></td>
           <td>${b.done ? "Finished" : "Unfinished"}</td>
@@ -128,7 +128,8 @@ class Element extends HTMLElement {
           <td>${b.filePath||b.remotePath||""}</td>
           <td>
             <field-ref ref="/backup/backup/${b.id}/log">Log</field-ref>
-            <button class="download ${["db-local", "fs-local"].includes(b.job?.dest.type) ? "" : "hidden"}">Download</button>
+            <button class="delete">Delete</button>
+            <button class="download ${["db-local", "fs-local", "drop-remote"].includes(b.job?.dest.type) ? "" : "hidden"}">Download</button>
           </td>
         </tr>
       `).join("")
@@ -159,10 +160,22 @@ class Element extends HTMLElement {
 
   async backupsClick(e){
     let id = e.target.closest("tr")?.getAttribute("data-id")
+    let url = e.target.closest("tr")?.getAttribute("data-url")
+    let type = e.target.closest("tr")?.getAttribute("data-type")
     if(!id) return;
     if(e.target.tagName == "BUTTON" && e.target.classList.contains("download")){
-      let {token} = await api.get("me/token")
-      window.open(`${apiURL()}/backup/backup/${id}/download?token=${token}`)
+      if(type == "drop-remote"){
+        if(url) window.open(url);
+        else alertDialog("No URL found");
+      } else {
+        let {token} = await api.get("me/token")
+        window.open(`${apiURL()}/backup/backup/${id}/download?token=${token}`)
+      }
+    }
+    else if(e.target.tagName == "BUTTON" && e.target.classList.contains("delete")){
+      if(!(await confirmDialog("Are you sure that you want to delete this backup? If the backup is stored remotely, the system will attempt to delete it."))) return;
+      await api.del(`backup/backup/${id}`)
+      this.refreshData()
     }
   }
 
