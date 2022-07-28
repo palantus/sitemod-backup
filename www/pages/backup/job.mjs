@@ -83,8 +83,6 @@ template.innerHTML = `
     <field-list labels-pct="30">
       <field-edit type="select" id="destType" label="Type">
         <option value="db-local">Database (local)</option>
-        <option value="db-remote">Database (remote)</option>
-        <option value="drop-local">File drop (local)</option>
         <option value="drop-remote">File drop (remote)</option>
         <option value="fs-local">File system (local)</option>
       </field-edit>
