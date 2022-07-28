@@ -74,9 +74,14 @@ export default class Job extends Entity {
     }
   }
 
-  execute(){
+  async execute(){
     let backup = new Backup(this)
-    return backup.execute()
+    try{
+      return await backup.execute()
+    } catch(err){
+      backup.log("Failed executing job")
+      return err;
+    }
   }
 
   calcNextRun(){
