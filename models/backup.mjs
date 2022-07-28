@@ -10,6 +10,7 @@ import {join} from "path"
 import fetch from "node-fetch"
 import User from "../../../models/user.mjs";
 import {service as userService} from "../../../services/user.mjs"
+import {createId} from "../../../tools/id.mjs"
 
 export default class Backup extends Entity {
   initNew(job) {
@@ -78,7 +79,7 @@ export default class Backup extends Entity {
 
     if(!src) this.log("Invalid source data", true)
 
-    this.filename = `backup_${getTimestamp()}.zip`;
+    this.filename = `backup_${createId(job.title)}_${getTimestamp()}.zip`;
 
     if(job.destType == "fs-local"){
       let path = job.buildPath(job.destFSPath, !!job.destFSIsRelative)
