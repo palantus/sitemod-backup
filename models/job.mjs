@@ -131,7 +131,8 @@ export default class Job extends Entity {
         db: {
           isFull: !!this.srcDatabaseFull,
           encrypt: !!this.srcEncrypt,
-          encryptPasswordSet: !!this.srcEncryptPassword
+          encryptPasswordSet: !!this.srcEncryptPassword,
+          includeDotEnv: !!this.srcDBIncludeDotEnv
         }
       },
       dest: {

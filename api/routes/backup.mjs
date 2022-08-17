@@ -97,6 +97,7 @@ export default (app) => {
     if(typeof req.body.srcEncryptPassword === "string") job.srcEncryptPassword = req.body.srcEncryptPassword;
     if(typeof req.body.srcRemote === "string") job.srcRemote = req.body.srcRemote || null;
     if(typeof req.body.srcDatabaseFull === "boolean") job.srcDatabaseFull = req.body.srcDatabaseFull;
+    if(typeof req.body.srcDBIncludeDotEnv === "boolean") job.srcDBIncludeDotEnv = req.body.srcDBIncludeDotEnv;
 
     if(typeof req.body.destType === "string") job.destType = req.body.destType || null;
 

@@ -74,6 +74,7 @@ template.innerHTML = `
       <field-edit class="src remote" type="select" label="Remote" lookup="federation-remote" id="srcRemote"></field-edit>
 
       <field-edit class="src db" label="Full backup" title="Including blobs" type="checkbox" id="srcDatabaseFull"></field-edit>
+      <field-edit class="src db" label="Include .env" title="Include .env file" type="checkbox" id="srcDBIncludeDotEnv"></field-edit>
       <field-edit class="src db" label="Encrypt" type="checkbox" id="srcDBEncrypt" field="srcEncrypt"></field-edit>
       <field-edit class="src db" label="Password" type="text" id="srcDBEncryptPassword" field="srcEncryptPassword"></field-edit>
     </field-list>
@@ -147,6 +148,7 @@ class Element extends HTMLElement {
     this.shadowRoot.getElementById("srcEncryptPassword").setAttribute("value", job.src.fs.encryptPasswordSet ? "*******" : "");
     this.shadowRoot.getElementById("srcRemote").setAttribute("value", job.src.remote);
     this.shadowRoot.getElementById("srcDatabaseFull").setAttribute("value", job.src.db.isFull);
+    this.shadowRoot.getElementById("srcDBIncludeDotEnv").setAttribute("value", job.src.db.includeDotEnv);
     this.shadowRoot.getElementById("srcDBEncrypt").setAttribute("value", job.src.db.encrypt);
     this.shadowRoot.getElementById("srcDBEncryptPassword").setAttribute("value", job.src.fs.encryptPasswordSet ? "*******" : "");
 

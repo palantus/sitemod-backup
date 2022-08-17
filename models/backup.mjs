@@ -121,7 +121,7 @@ export default class Backup extends Entity {
   }
 
   async getSourceDB(job){
-    let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}?encrypt=${job.srcEncrypt ? "true" : "false"}`
+    let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}`
     try{
       let authToken = userService.getTempAuthToken(User.lookupAdmin())
       let res = await fetch(`${global.sitecore.apiURL}/${path}`, {
@@ -130,7 +130,11 @@ export default class Backup extends Entity {
           'Authorization': 'Basic ' + Buffer.from(`${''}:${authToken}`, 'binary').toString('base64'),
           'Content-Type' : "application/json"
         },
-        body: JSON.stringify({encrypt: !!job.srcEncrypt, password: job.srcEncryptPassword})
+        body: JSON.stringify({
+          encrypt: !!job.srcEncrypt, 
+          password: job.srcEncryptPassword,
+          includeDotEnv: !!job.srcDBIncludeDotEnv
+        })
       })
       return {type: "fetch-response", res}
     } catch(err){
