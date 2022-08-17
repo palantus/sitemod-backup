@@ -149,7 +149,11 @@ export default class Backup extends Entity {
     if(!remote) this.log(`Unkown source remote: ${job.srcRemote}`, true)
     let path = `system/database/download/${job.srcDatabaseFull ? "full" : "data"}`
     try{
-      let res = await remote.post(path, {encrypt: !!job.srcEncrypt, password: job.srcEncryptPassword}, {returnRaw: true})
+      let res = await remote.post(path, {
+          encrypt: !!job.srcEncrypt, 
+          password: job.srcEncryptPassword,
+          includeDotEnv: !!job.srcDBIncludeDotEnv
+        }, {returnRaw: true})
       return {type: "fetch-response", res}
     } catch(err){
       this.log(`Got error when requesting source db remote: ${err}`)
