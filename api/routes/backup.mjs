@@ -4,6 +4,7 @@ const route = Router();
 import { noGuest, validateAccess } from "../../../../services/auth.mjs"
 import Backup from "../../models/backup.mjs";
 import Job from "../../models/job.mjs"
+import contentDisposition from 'content-disposition'
 
 export default (app) => {
 
@@ -133,13 +134,13 @@ export default (app) => {
     let backup = Backup.lookup(req.params.id)
     if (!backup) throw "Unknown backup"
     if(backup.related.job.destType == "db-local"){
-      res.setHeader('Content-disposition', `attachment; filename=${backup.filename||"backup.zip"}`);
+      res.setHeader('Content-disposition', contentDisposition(`${backup.filename||"backup.zip"}`));
       res.setHeader('Content-Type', "application/zip");
       if(backup.size) res.setHeader('Content-Length', backup.size);
       backup.blob.pipe(res)
     } else if(backup.related.job.destType == "fs-local"){
       if(backup.filePath){
-        res.setHeader('Content-disposition', `attachment; filename=${backup.filename||"backup.zip"}`);
+        res.setHeader('Content-disposition', contentDisposition(`${backup.filename||"backup.zip"}`));
         res.setHeader('Content-Type', "application/zip");
         res.sendFile(backup.filePath)
       } else
