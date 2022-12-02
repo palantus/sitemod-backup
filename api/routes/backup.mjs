@@ -137,7 +137,9 @@ export default (app) => {
       res.setHeader('Content-disposition', contentDisposition(`${backup.filename||"backup.zip"}`));
       res.setHeader('Content-Type', "application/zip");
       if(backup.size) res.setHeader('Content-Length', backup.size);
-      backup.blob.pipe(res)
+      let blob = backup.blob
+      if(blob) blob.pipe(res)
+      else throw "Blob is missing in db"
     } else if(backup.related.job.destType == "fs-local"){
       if(backup.filePath){
         res.setHeader('Content-disposition', contentDisposition(`${backup.filename||"backup.zip"}`));
