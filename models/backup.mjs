@@ -94,7 +94,7 @@ export default class Backup extends Entity {
 
     } else if(job.destType == "db-local"){
       if(src.type == "fetch-response"){
-        this.setBlob(src.res.body)
+        await this.setBlob(src.res.body)
         this.log(`Stored backup as blob`)
       } else {
         this.log("Unknown source data type", true)
