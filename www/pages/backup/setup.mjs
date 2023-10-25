@@ -1,13 +1,13 @@
 const elementName = 'backup-setup-page'
 
-import api from "/system/api.mjs"
-import "/components/field-edit.mjs"
-import "/components/field-list.mjs"
-import "/components/action-bar.mjs"
-import "/components/action-bar-item.mjs"
-import {on, off} from "/system/events.mjs"
-import { alertDialog, showDialog, confirmDialog } from "/components/dialog.mjs"
-import {goto, apiURL} from "/system/core.mjs"
+import api from "../../system/api.mjs"
+import "../../components/field-edit.mjs"
+import "../../components/field-list.mjs"
+import "../../components/action-bar.mjs"
+import "../../components/action-bar-item.mjs"
+import {on, off} from "../../system/events.mjs"
+import { alertDialog, showDialog, confirmDialog } from "../../components/dialog.mjs"
+import {goto, apiURL} from "../../system/core.mjs"
 
 const template = document.createElement('template');
 template.innerHTML = `

@@ -1,10 +1,10 @@
 const elementName = 'backup-job-log-page'
 
-import api from "/system/api.mjs"
-import "/components/action-bar.mjs"
-import "/components/action-bar-item.mjs"
-import {on, off} from "/system/events.mjs"
-import {state} from "/system/core.mjs"
+import api from "../../system/api.mjs"
+import "../../components/action-bar.mjs"
+import "../../components/action-bar-item.mjs"
+import {on, off} from "../../system/events.mjs"
+import {state} from "../../system/core.mjs"
 
 
 const template = document.createElement('template');
