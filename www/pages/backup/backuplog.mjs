@@ -9,7 +9,7 @@ import {state} from "../../system/core.mjs"
 
 const template = document.createElement('template');
 template.innerHTML = `
-  <link rel='stylesheet' href='../css/global.css'>
+  <link rel='stylesheet' href='/css/global.css'>
   <style>
     #container{
         padding: 10px;
